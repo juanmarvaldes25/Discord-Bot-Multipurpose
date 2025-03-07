@@ -7,6 +7,7 @@ from dataclasses import dataclass
 import discord
 import logging
 import secrets
+import busreq
 
 BOT_TOKEN = '' #Bot token, very private
 CHANNEL_ID = 1346296732547551353 #Channel id for 'Bot'
@@ -15,6 +16,7 @@ fartPhrases = ["So smelly!", "Yuck!", "No smell...", "Very nice", "It's wet...",
  
 logging.basicConfig(format='%(levelname)s:%(message)s', level = logging.INFO) #logging setup. Prints logging level before message
 logger = logging.getLogger(__name__) #logger to print securely to console
+
 
 
 
@@ -87,6 +89,17 @@ async def reminder():
     await channel.send(f"Is anyone there?")
     
    
+@bot.command()
+async def bus(ctx, arg):
+    bus_finder = busreq.BusFinder(logger)
+    try:
+     result = bus_finder.nextDeparture(arg)
+     await ctx.send(result)
+    
+    except Exception as e:
+     logger.error(f'Oh no! {e}')
+     
+    
 #can be used to schedule things determed by x amount of ours
 
 
