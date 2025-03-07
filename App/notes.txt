@@ -1,0 +1,31 @@
+#site text boilerplate -> user input -> validate -> searhc
+
+#function 1 should take a number and return the first result (next bus) for a given stop
+#function 2 should return an array of next 3 stops
+#the problem lies in having an offset: some stops have more and therefore display more. solution: take central station, display by 100, then find:
+#partial text search: 11?
+#answer: use selenium. use colon as delimiter, take the hour section, then find all results for that hour and concatenate
+#into one message
+#also take through binding. in this case, we may need to
+
+
+#ex1: tkae station number and return next bus
+#ex2: return the next n departures (by stop) varies by stop business
+#ex3: all departures in the next hour (sort by time)
+
+
+#another solution: use discord tasks to 'schedule' the task THIS THIS THIS THIS, eg it will run 1hr before the given time.
+#saves having to run through websites with selenium:
+#the bot wll have capacity to get departures for current hour, next hour, then any hour after that will be scheduled
+#eg the time is 11:20. The bot can get next n departures 
+#different but similar functionality: schedule a time and, 30 minutes before, notify of all departures for a 
+# #specified stop (arg 1), route (arg2), time
+#so 212121 (epping), route 550, time is 12pm. Time cannot be in the past. At this time, if 12pm is not more than one hour, start notifs
+#if 12pm is more than hour (ie it is before 11am), at 11:15 start receiving departure notifs
+
+#this is essentially creating scheduled tasks via discord. ie user input of command + args will return an array/list of departures. if
+#is over one hour in future, first scheduled task created: this will run the code when the time is one hour the desired time
+#when one hour before, multiple discord messages will be scheduled. These will be 5 minutes before the departure time of each bus
+
+#start small: departures in the next hour ( p = 50). command to stop when boarded (clear list or whatever)
+#next hour, nest 2 hours, or next n departures (maybe do both?)

@@ -1,17 +1,22 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from discord.ext import commands
+import requests, bs4
+from discord.ext import commands, tasks
 from dataclasses import dataclass
 import discord
 import logging
 import secrets
 
-BOT_TOKEN = '...' #Bot token, very private
+BOT_TOKEN = '' #Bot token, very private
 CHANNEL_ID = 1346296732547551353 #Channel id for 'Bot'
+TASK_TIME_LIMIT_SECONDS = 40
+fartPhrases = ["So smelly!", "Yuck!", "No smell...", "Very nice", "It's wet...", "Singing fart!"]
+ 
 logging.basicConfig(format='%(levelname)s:%(message)s', level = logging.INFO) #logging setup. Prints logging level before message
 logger = logging.getLogger(__name__) #logger to print securely to console
-fartPhrases = ["So smelly!", "Yuck!", "No smell...", "Very nice", "It's wet...", "Singing fart!"]
+
+
 
 @dataclass #new class to store study session data
 class Session:
@@ -58,10 +63,33 @@ async def start(ctx):
     
 @bot.command()
 async def end(ctx):
-    #TODO
+    if not session.is_active:
+        await ctx.send("No Active Session Found: start one first")
+        return
+        
+    session.is_active = False
+    end_time = ctx.message.created_at.timestamp()
+    duration = end_time - session.start_time
+    
+    #new function
+    minutes = int(duration // 60)
+    remaining_seconds = duration % 60
+
+    formatted_time = f"{minutes} min {remaining_seconds:.2f}"
+    print(formatted_time)
+
+
+    await ctx.send(f"Session ended after {formatted_time} seconds")
+    
+@tasks.loop(minutes = TASK_TIME_LIMIT_SECONDS, count = 2)
+async def reminder():
+    channel = bot.get_channel(CHANNEL_ID)
+    await channel.send(f"Is anyone there?")
     
    
-    
+#can be used to schedule things determed by x amount of ours
+
+
 #to run the bot (will loop when run)
 bot.run(BOT_TOKEN)
     
