@@ -7,23 +7,17 @@ from dataclasses import dataclass
 import discord
 import logging
 import secrets
+from session import Session
 import busreq
 
 BOT_TOKEN = '' #Bot token, very private
 CHANNEL_ID = 1346296732547551353 #Channel id for 'Bot'
 TASK_TIME_LIMIT_SECONDS = 40
-fartPhrases = ["So smelly!", "Yuck!", "No smell...", "Very nice", "It's wet...", "Singing fart!"]
  
 logging.basicConfig(format='%(levelname)s:%(message)s', level = logging.INFO) #logging setup. Prints logging level before message
 logger = logging.getLogger(__name__) #logger to print securely to console
 
 
-
-
-@dataclass #new class to store study session data
-class Session:
-    is_active: bool = False
-    start_time: int = 0
 
 
 bot = commands.Bot(command_prefix = "!", intents=discord.Intents.all()) #bot constructor, with all neccesary intents
@@ -35,11 +29,6 @@ async def on_ready():
     channel = bot.get_channel(CHANNEL_ID)
     await channel.send("Piu, can you smell my fart?") #sends to specified channel, await needed as is asynchronous 
     
-@bot.command() #if needs to respond to user, use the command tag
-async def fart(ctx): #ctx is context argument
-    phraseIndex = secrets.choice(fartPhrases)
-    logger.info("Sending message: %s", phraseIndex)
-    await ctx.send(phraseIndex)
     
 @bot.command() #as many string arguments as needed example
 async def commonsense(ctx, *args):
