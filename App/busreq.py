@@ -24,18 +24,16 @@ class BusFinder:
         self.driver = webdriver.Firefox(service=self.s, options = self.firefox_options)
 
      def nextDeparture(self, input_stop):
-        
         payload = []
         try:
          self.changeSelfStop(input_stop)  # Update stop
-         url = self.base_url + self.busStop + "&departureOffset=0&departureLimit=25" # Build the new URL 
+         url = self.buildURL(self.busStop) # Build the new URL 
          self.logger.info(f'the URL is {url}')
          
          #selenium
          self.driver.get(url)
          wait = WebDriverWait(self.driver, 7)
          element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'text-small.departure-time.ng-binding')))
-         
          page_source = self.driver.page_source
          busSoup = bs4.BeautifulSoup(page_source, 'html.parser')
          
@@ -49,8 +47,8 @@ class BusFinder:
          else:
           print("Element not found.") 
          
-         elements = busSoup.select('.flex-shrink-0.ng-scope.ng-isolate-scope') #.flex-shrink-0.ng-scope.ng-isolate-scope = class name for each entry
-         #more stuff here
+         elements = busSoup.select('.flex-shrink-0.ng-scope.ng-isolate-scope') 
+         
          for elem in elements:
              bus_no = elem.find('strong', class_ = 'ng-binding')
              print(bus_no.get_text(strip=True))
@@ -95,17 +93,50 @@ class BusFinder:
          self.logger.error(f'{e} in function nextDeparture')
          data = []
          return data
+    
+     def getStationName(self, input_stop): #get the name of the station
+        payload = ''
+        try:
+   
+         self.changeSelfStop(input_stop)  # Update stop
+         url = self.buildURL(self.busStop) # Build the new URL 
+         self.logger.info(f'the URL is {url}')
+         
+         #selenium
+         self.driver.get(url)
+         wait = WebDriverWait(self.driver, 7)
+         element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'text-small.departure-time.ng-binding')))
+         page_source = self.driver.page_source
+         busSoup = bs4.BeautifulSoup(page_source, 'html.parser')
+         
+         searcher = busSoup.select('#atapp-root > div.ng-scope.flex-fill.d-flex.flex-column.min-h-0 > div > anytrip-live-map > div > div.d-none.d-md-flex.flex-shrink-0.anytrip-livemap-bar.d-flex.anytrip-livemap-bar-expanded > div.d-flex.flex-column.flex-fill.min-h-100.max-h-100.max-w-100.ng-scope > div:nth-child(1)') 
+         nameElem = searcher[0].find('div', class_= 'text-small text-truncate ng-binding')
+         
+         if nameElem:
+             station_name = nameElem.get_text(strip=True)
+             payload + station_name
+             print("Station name:", station_name)
+         else:
+             print("Element not found.") 
             
-
-       
+         return payload
             
-
-#TODO : error handling and input verification
+            
+        except Exception as e:
+            self.logger.error(f'{e}')
+        
+     def buildURL(self, stationID):
+        return self.base_url + stationID + "&departureOffset=0&departureLimit=25"
+     
+        
      def changeSelfStop(self, input_stop):
-        if not input_stop.isnumeric() and len(input_stop) != 7:
+        if not input_stop.isnumeric() or len(input_stop) > 7 or len(input_stop) < 6:
             raise TypeError("input not numeric")
-            return
-        self.busStop = input_stop
+            
+        else: 
+            self.busStop = input_stop
+        
+    
     
 def main():
     # Set up logging
@@ -116,8 +147,9 @@ def main():
     bus_finder = BusFinder(logger)
 
     # Test nextDeparture method with a sample stop ID
-    test_stop = "200060"  # Replace with an actual stop ID if needed
-    bus_finder.nextDeparture(test_stop)
+    test_stop = "212110"  # Replace with an actual stop ID if needed
+    #bus_finder.nextDeparture(test_stop)
+    bus_finder.getStationName(test_stop)
 
 if __name__ == "__main__":
     main()

@@ -7,6 +7,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import bs4
 
 # Set up Firefox options
+
+
 firefox_options = Options()
 firefox_options.add_argument("--headless")
 
