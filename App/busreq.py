@@ -31,21 +31,7 @@ class BusFinder:
          self.logger.info(f'the URL is {url}')
          
          #selenium
-         self.driver.get(url)
-         wait = WebDriverWait(self.driver, 7)
-         element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'text-small.departure-time.ng-binding')))
-         page_source = self.driver.page_source
-         busSoup = bs4.BeautifulSoup(page_source, 'html.parser')
-         
-         searcher = busSoup.select('#atapp-root > div.ng-scope.flex-fill.d-flex.flex-column.min-h-0 > div > anytrip-live-map > div > div.d-none.d-md-flex.flex-shrink-0.anytrip-livemap-bar.d-flex.anytrip-livemap-bar-expanded > div.d-flex.flex-column.flex-fill.min-h-100.max-h-100.max-w-100.ng-scope > div:nth-child(1)') 
-         nameElem = searcher[0].find('div', class_= 'text-small text-truncate ng-binding')
-         
-         if nameElem:
-          station_name = nameElem.get_text(strip=True)
-          payload.insert(0, station_name)
-          print("Station name:", station_name)
-         else:
-          print("Element not found.") 
+         busSoup = self.seleniumSetup(url, 'text-small.departure-time.ng-binding')
          
          elements = busSoup.select('.flex-shrink-0.ng-scope.ng-isolate-scope') 
          
@@ -93,6 +79,15 @@ class BusFinder:
          self.logger.error(f'{e} in function nextDeparture')
          data = []
          return data
+     
+     def seleniumSetup(self, input_url, class_for_driver): #only use classname in EC.presence_of_element_located, returns BeautifulSoup Object
+        self.driver.get(input_url)
+        wait = WebDriverWait(self.driver, 7)
+        element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, class_for_driver)))
+        page_source = self.driver.page_source
+        busSoup = bs4.BeautifulSoup(page_source, 'html.parser')
+        return busSoup
+        
     
      def getStationName(self, input_stop): #get the name of the station
         payload = ''
@@ -103,12 +98,7 @@ class BusFinder:
          self.logger.info(f'the URL is {url}')
          
          #selenium
-         self.driver.get(url)
-         wait = WebDriverWait(self.driver, 7)
-         element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'text-small.departure-time.ng-binding')))
-         page_source = self.driver.page_source
-         busSoup = bs4.BeautifulSoup(page_source, 'html.parser')
-         
+         busSoup = self.seleniumSetup(url, 'text-small.departure-time.ng-binding')
          searcher = busSoup.select('#atapp-root > div.ng-scope.flex-fill.d-flex.flex-column.min-h-0 > div > anytrip-live-map > div > div.d-none.d-md-flex.flex-shrink-0.anytrip-livemap-bar.d-flex.anytrip-livemap-bar-expanded > div.d-flex.flex-column.flex-fill.min-h-100.max-h-100.max-w-100.ng-scope > div:nth-child(1)') 
          nameElem = searcher[0].find('div', class_= 'text-small text-truncate ng-binding')
          
@@ -148,8 +138,8 @@ def main():
 
     # Test nextDeparture method with a sample stop ID
     test_stop = "212110"  # Replace with an actual stop ID if needed
-    #bus_finder.nextDeparture(test_stop)
-    bus_finder.getStationName(test_stop)
+    bus_finder.nextDeparture(test_stop)
+    #bus_finder.getStationName(test_stop)
 
 if __name__ == "__main__":
     main()
