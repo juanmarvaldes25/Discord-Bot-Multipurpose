@@ -41,6 +41,7 @@ async def add(ctx, *arr):
     for i in arr:
         result+= int(i)
     await ctx.send(f"Result: {result}")
+
     
 @bot.command() #start a session - may be useful for poker?
 async def start(ctx):
@@ -79,14 +80,25 @@ async def reminder():
     
    
 @bot.command()
-async def bus(ctx, arg):
-    bus_finder = busreq.BusFinder(logger)
-    try:
-     result = bus_finder.nextDeparture(arg)
-     await ctx.send(result)
+async def bus(ctx, *arg):
     
-    except Exception as e:
-     logger.error(f'Oh no! {e}')
+    if arg: 
+     bus_finder = busreq.BusFinder(logger)
+     n = '25'
+     if len(arg) == 2:
+      n = str(arg[1])
+    
+     try:
+      result = bus_finder.nextDeparture(arg[0], n)
+      await ctx.send(result)
+    
+     except Exception as e:
+      logger.error(f'Oh no! {e}')
+    await ctx.send(' placeholder: i need a command!!')
+    return
+     
+     
+
      
     
 #can be used to schedule things determed by x amount of ours

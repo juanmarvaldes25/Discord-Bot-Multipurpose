@@ -56,7 +56,12 @@ Feel free to modify and expand the bot’s functionality!
 TODO:
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 unit tests bus scraper
-postre sql database via render and class for persistent user data
+Postgre SQL via RENDER, for config data per user! may need an interface for discord -> bot -> handler -> processor into SQL -> retrieve from DB 
+then it goes from DB -> processor, which calls the selenium methods -> databack to handler -> back to bot
+
+only the PROCESSOR should call the functions from busreq and DB
+
+
 openAI trANSALTION
 
 more bus functionality

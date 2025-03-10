@@ -22,22 +22,31 @@ class BusFinder:
         self.geckodriver_path = "C:\\Program Files\\geckodriver.exe"
         self.s = Service(self.geckodriver_path)
         self.driver = webdriver.Firefox(service=self.s, options = self.firefox_options)
-
-     def nextDeparture(self, input_stop):
+     
+     def verifyDepartureN(self, n):
+         if str(n).isnumeric() and (int(n) <= 50) and int(n) >= 1:
+             return True
+         raise TypeError("Number of departures is not numeric or not in range 1-50")
+        
+          
+     def nextDeparture(self, input_stop, n = '25'):
         payload = []
         try:
          self.changeSelfStop(input_stop)  # Update stop
-         url = self.buildURL(self.busStop) # Build the new URL 
+         self.verifyDepartureN(n)
+         url = self.buildURL(self.busStop, n) # Build the new URL 
          self.logger.info(f'the URL is {url}')
          
          #selenium
          busSoup = self.seleniumSetup(url, 'text-small.departure-time.ng-binding')
-         
          elements = busSoup.select('.flex-shrink-0.ng-scope.ng-isolate-scope') 
          
          for elem in elements:
              bus_no = elem.find('strong', class_ = 'ng-binding')
              print(bus_no.get_text(strip=True))
+             
+             bus_name = elem.find('strong', class_ = 'text-gray-dark ng-binding')
+             print(bus_name.get_text(strip=True))
              
              
              time = elem.find('div', class_='text-small departure-time ng-binding')
@@ -67,7 +76,7 @@ class BusFinder:
                  
              print('------')
             
-             payload.append(bus_no.get_text(strip=True) +' '+  time.get_text(strip=True) +' '+ span_existent_toPayload.get_text(strip=True) + ' | ' )
+             payload.append(bus_no.get_text(strip=True) +' ' + bus_name.get_text(strip=True) + '' +  time.get_text(strip=True) +' '+ span_existent_toPayload.get_text(strip=True) + ' | ' )
           
           
          
@@ -115,8 +124,13 @@ class BusFinder:
         except Exception as e:
             self.logger.error(f'{e}')
         
-     def buildURL(self, stationID):
-        return self.base_url + stationID + "&departureOffset=0&departureLimit=25"
+     
+     def getNextStop(self): #TODO
+         payload =''
+         
+     
+     def buildURL(self, stationID, n = '25'):
+        return self.base_url + stationID + "&departureOffset=0&departureLimit=" + str(n)
      
         
      def changeSelfStop(self, input_stop):
@@ -152,13 +166,3 @@ if __name__ == "__main__":
 
 
 
-#given a stop, get next N departures
-#TODO
-
-#given a stop, get next departure with realtime info on delay (delay value: scrape )
-#TODO
-
-#given a stop, get next N departures with realtime info on delays
-
-
-#remind me at x : set a reminder to depart at x time the next day
